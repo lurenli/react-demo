@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
     //entry: path.resolve(__dirname, './main.js'),
     entry: [
@@ -7,7 +8,8 @@ module.exports = {
         path.resolve(__dirname, './main.js')],
     output: {
         path: path.resolve(__dirname, './build'),
-        filename: 'bundle.js'
+        filename: '[name].[hash].js',
+        chunkFilename: '[name].[chunkhash].js'
     },
     module: {
         rules: [
@@ -23,6 +25,26 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: ['style-loader', 'css-loader']
+            },
+            {
+                test: /\.(png|jpg|gif)$/,
+                use: [
+                    {
+                        loader: 'url-loader',
+                        options: {
+                            limit: 8192
+                        }
+                    }
+                ]
+            },
+            {
+                test: /\.(png|jpg|gif)$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {}
+                    }
+                ]
             }
         ]
     },
@@ -47,5 +69,11 @@ module.exports = {
     plugins: [
         new webpack.HotModuleReplacementPlugin()
     ],
+    plugins: [
+        new webpack.HotModuleReplacementPlugin(),
+        new HtmlWebpackPlugin({
+            filename: 'index.html',
+            template: path.join(__dirname, 'index.html')
+        })],
     devtool: "source-map",
 };

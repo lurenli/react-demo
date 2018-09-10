@@ -2,3 +2,9 @@
     border: 1px solid red !important;
     background: yellow
 }
+
+.img {
+    width: 100px;
+    height: 100px;
+    display: inline-block
+}
