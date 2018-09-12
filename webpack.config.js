@@ -1,8 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
+
 module.exports = {
-    //entry: path.resolve(__dirname, './main.js'),
     entry: {
         app: [
             "react-hot-loader/patch",
@@ -28,7 +31,11 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: ['style-loader', 'css-loader']
+                use: ExtractTextPlugin.extract({
+                    fallback: "style-loader",
+                    use: "css-loader"
+                  })
+                //use: ['style-loader', 'css-loader']
             },
             {
                 test: /\.(png|jpg|gif)$/,
@@ -61,15 +68,6 @@ module.exports = {
             Redux: path.join(__dirname, 'src/redux')
         }
     },
-    // webpack-dev-server 报错 解决方案 将 webpack-cli 和 webpack-dev-server版本降低到@2
-    devServer: {
-        contentBase: path.join(__dirname, "./build"),
-        historyApiFallback: true,
-        hot: true,
-        // host: '0.0.0.0', //使手机可以通过IP访问页面
-        compress: true,
-        port: 9000
-    },
     plugins: [
         new webpack.HotModuleReplacementPlugin()
     ],
@@ -81,7 +79,18 @@ module.exports = {
         }),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'vendor'
+        }),
+        new UglifyJSPlugin(),
+        new webpack.DefinePlugin({
+            'process.env': {
+                'NODE_ENV': JSON.stringify('production')
+            }
+        }),
+        new CleanWebpackPlugin(['build']),
+        new ExtractTextPlugin({
+            filename: '[name].[contenthash:5].css',
+            allChunks: true
         })
     ],
-    devtool: "source-map",
+    devtool: "cheap-module-source-map",
 };
